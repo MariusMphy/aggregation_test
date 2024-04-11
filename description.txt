@@ -1,0 +1,8 @@
+This is the project to test aggregation pipelines operations in PyMongo.
+
+Separate operations
+	Filtering
+	Sorting
+	Grouping
+
+Combined operations
