@@ -6,6 +6,8 @@ from pymongo.cursor import Cursor
 from pprint import pprint
 from pymongo.errors import OperationFailure, WriteError, ConfigurationError, PyMongoError
 import random
+
+import validation
 from fill_db import RandDB
 
 
@@ -31,6 +33,7 @@ class Main:
     def call_to_fill_db():
         rdb = RandDB()
         rdb.create_random_db()
+        return rdb
 
     # tried to use pipeline as separate function, but it seems it is better not
     @staticmethod
@@ -183,7 +186,9 @@ class Main:
         self.mileage_min = input("Enter minimum mileage: ")
         self.mileage_max = input("Enter maximum mileage: ")
         self.date_min = input("Enter minimum date of production (YYYY-MM-DD): ")
+        validation.validate_date(self.date_min)
         self.date_max = input("Enter maximum date of production (YYYY-MM-DD): ")
+        validation.validate_date(self.date_max)
 
     # filters by user input
     def filter7(self):
@@ -221,7 +226,8 @@ class Main:
 
 if __name__ == "__main__":
     agg = Main()
-    # agg.call_to_fill_db()
+    fill = agg.call_to_fill_db()
+    validation_rules = validation.create_rules(fill)
     # agg.filter1()
     # agg.filter2()
     # agg.filter3()
@@ -229,7 +235,7 @@ if __name__ == "__main__":
     # agg.filter5()
     # agg.filter6()
     # agg.agg3_input()
-    agg.filter7()
+    # agg.filter7()
 
     # pprint(list(agg.agg3.find_one()))
 

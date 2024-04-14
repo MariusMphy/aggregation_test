@@ -1,11 +1,21 @@
 from pymongo import MongoClient
 import random
 from datetime import datetime, timedelta
+from pymongo.errors import OperationFailure, WriteError, ConfigurationError, PyMongoError
+from pprint import pprint
+import validation
 
 
 class RandDB:
     def __init__(self):
-        pass
+        self.db_name = None
+        self.collection_name = None
+        self.amount = None
+        self.str_field1 = None
+        self.str_field2 = None
+        self.str_date = None
+        self.int_field = None
+        self.float_field = None
 
     @staticmethod
     def randomize_word(library):
@@ -35,44 +45,56 @@ class RandDB:
         # Return the random date as a string in the format 'yyyy-mm-dd'
         return random_date.strftime("%Y-%m-%d")
 
+    def create_empty_collection(self):
+        self.db_name = input("Enter DB name: ")
+        self.collection_name = input("Enter collection name: ")
+        self.amount = int(input("Enter amount of documents in collection: "))
+        self.str_field1 = input("Enter name for string field 1: ")
+        self.str_field2 = input("Enter name of string field 2: ")
+        self.str_date = input("Enter date field name: ")
+        self.int_field = input("Enter name of integer field: ")
+        self.float_field = input("Enter name of float field: ")
+
     def create_random_db(self):
-        db_name = input("Enter DB name: ")
-        collection_name = input("Enter collection name: ")
-        amount = int(input("Enter amount of documents in collection: "))
-        # will maybe implement later option to pick number of every type (str, int, float) of field.
-        # str_fields_no = int(input("Enter how many string fields you want: "))
+        self.create_empty_collection()
         str_field1_library = input("Chose string field 1 from (animals5, animals20, cars5, cars20, "
                                    "electronics5, electronics20, letters5, letters20, names5, names20, names200"
                                    "words5, words20, words213): ")
-        str_field1 = input("Enter name for string field 1: ")
-        str_field2_library = input("Chose string field 1 from (animals5, animals20, cars5, cars20, "
+        str_field2_library = input("Chose string field 2 from (animals5, animals20, cars5, cars20, "
                                    "electronics5, electronics20, letters5, letters20, names5, names20, names200"
                                    "words5, words20, words213): ")
-        str_field2 = input("Enter name of string field 2: ")
-        str_date = input("Enter date field name: ")
         starting_date = input("Enter starting date for date field (yyyy-mm-dd): ")
         ending_date = input("Enter ending date for date field (yyyy-mm-dd) or press enter for today: ")
         str_today = datetime.today().strftime("%Y-%m-%d")
         ending_confirmed = str_today if not ending_date else ending_date
-        int_field = input("Enter name of integer field: ")
         int_start = int(input("Enter starting number of integer field range: "))
         int_end = int(input("Enter ending number of integer field range: "))
-        float_field = input("Enter name of float field: ")
         float_start = round(float(input("Enter starting number of float field range: ")), 4)
         float_end = round(float(input("Enter ending number of float field range: ")), 4)
 
         client = MongoClient("localhost", 27017)
-        db = client[db_name]
-        collection = db[collection_name]
-        for number in range(amount):
+        db = client[self.db_name]
+        collection = db[self.collection_name]
+        # validate new data
+        validation_rules = validation.create_rules(self)
+        db.create_collection(collection.name, validator=validation_rules['validator'])
+
+        for number in range(self.amount):
             goods = {
-                str_field1: self.randomize_word(str_field1_library),
-                str_field2: self.randomize_word(str_field2_library),
-                str_date: self.random_date(starting_date, ending_confirmed),
-                int_field: random.randint(int_start, int_end),
-                float_field: round(random.uniform(float_start, float_end), 4)
+                self.str_field1: self.randomize_word(str_field1_library),
+                self.str_field2: self.randomize_word(str_field2_library),
+                self.str_date: self.random_date(starting_date, ending_confirmed),
+                self.int_field: random.randint(int_start, int_end),
+                self.float_field: round(random.uniform(float_start, float_end), 4)
             }
-            collection.insert_one(goods)
+            try:
+                collection.insert_one(goods)
+            except WriteError as wr:
+                pprint(wr.details)
+            except OperationFailure as op:
+                pprint(op)
+
+            # collection.insert_one(goods)
 
 
 if __name__ == "__main__":
