@@ -41,9 +41,13 @@ class RandDB:
         amount = int(input("Enter amount of documents in collection: "))
         # will maybe implement later option to pick number of every type (str, int, float) of field.
         # str_fields_no = int(input("Enter how many string fields you want: "))
-        str_field1_library = input("Chose string field 1 from (animals, cars, electronics, letters, names, words, words_long)")
+        str_field1_library = input("Chose string field 1 from (animals5, animals20, cars5, cars20, "
+                                   "electronics5, electronics20, letters5, letters20, names5, names20, names200"
+                                   "words5, words20, words213)")
         str_field1 = input("Enter name for string field 1: ")
-        str_field2_library = input("Chose string field 2 from (animals, cars, electronics, letters, names, words, words_long)")
+        str_field2_library = input("Chose string field 1 from (animals5, animals20, cars5, cars20, "
+                                   "electronics5, electronics20, letters5, letters20, names5, names20, names200"
+                                   "words5, words20, words213)")
         str_field2 = input("Enter name of string field 2: ")
         str_date = input("Enter date field name: ")
         starting_date = input("Enter starting date for date field (yyyy-mm-dd): ")
